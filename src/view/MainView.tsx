@@ -1,28 +1,65 @@
 import * as React from 'react';
-import {Box, Link, Stack, TextareaAutosize} from "@mui/material";
+import {Grid, Button, Link, Stack, TextareaAutosize} from "@mui/material";
 import {useControlledCookieState} from "../hook/useControlledCookieState";
 import * as api from '../api/1.0';
+import {Typography} from '@mui/material';
+import FingerprintIcon from '@mui/icons-material/Fingerprint';
+import PermIdentityIcon from '@mui/icons-material/PermIdentity';
+import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
+import {TabRoutes} from '../App';
 
-export const MainView = (): JSX.Element => {
+interface Props {
+    setTab: (tab: TabRoutes) => void;
+}
+
+export const MainView = (props: Props): JSX.Element => {
 
     const [login, setLogin] = useControlledCookieState('titan_login', '');
-
-    const downloadClient = React.useCallback(() => {
-        api.get('/launcher')
-    }, []);
-
+    
     return (
-        <Box sx={{
-            margin: 2
-        }}>
-            <Stack direction="column"
-                   spacing={2}>
+        <Grid container
+              direction="column"
+              justifyContent="space-between"
+              alignItems="flex-start"
+              rowSpacing={1}>
+            <Grid item>
+                <Typography sx={{fontSize: 24}} gutterBottom>
+                    Добро пожаловать на проект Titan!
+                </Typography>
+            </Grid>
 
-                <div>Добро пожаловать на проект Titan!</div>
-                {!login && (<div>Для начала необходимо <Link href='/registration'>Зарегистрироваться</Link>.</div>)}
-                <div>Потом надо <Link onClick={downloadClient}>скачать лаунчер</Link>  </div>
-            </Stack>
+            {!login && (
+                <Grid item>
+                    <Button variant="contained"
+                            onClick={() => props.setTab(TabRoutes.LOGIN)}
+                            sx={{fontSize: 18}}
+                            endIcon={<FingerprintIcon/>}>
+                        Войти
+                    </Button>
+                </Grid>
+            )}
 
-        </Box>
+            {!login && (
+                <Grid item>
+                    <Button variant="contained"
+                            onClick={() => props.setTab(TabRoutes.REGISTRATION)}
+                            sx={{fontSize: 18}}
+                            endIcon={<PermIdentityIcon/>}>
+                        Зарегистрироваться
+                    </Button>
+                </Grid>
+            )}
+
+
+            <Grid item>
+                <Button variant="contained"
+                        onClick={() => api.get('/launcher', ['file', 'TitanLauncher.jar'])}
+                        sx={{fontSize: 18}}
+                        endIcon={<SportsEsportsIcon/>}>
+                    Скачать лаунчер
+                </Button>
+            </Grid>
+
+        </Grid>
     );
 }

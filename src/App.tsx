@@ -6,16 +6,18 @@ import {useControlledCookieState} from "./hook/useControlledCookieState";
 import {MainView} from "./view/MainView";
 import {ModalDialog} from "./view/ModalDialog";
 import {Registration} from "./view/Registration";
+import {Login} from "./view/Login";
+import {ServersView} from "./view/ServersView";
 
 
 export enum TabRoutes {
     MAIN = '/main',
     REGISTRATION = '/registration',
+    LOGIN = '/login',
     SERVERS = '/servers',
 }
 
 export const App = (): JSX.Element => {
-
     let history = useHistory();
 
     const [login, setLogin] = useControlledCookieState('titan_login', '');
@@ -23,9 +25,14 @@ export const App = (): JSX.Element => {
 
     const [showLogOut, setShowLogOut] = React.useState(false);
 
+    const changeTab = React.useCallback((t: TabRoutes) => {
+        setTab(t);
+        history.push(t);
+    }, []);
+
     React.useEffect(() => {
-        if (login && tab === TabRoutes.REGISTRATION) {
-            setTab(TabRoutes.MAIN);
+        if (login && (tab === TabRoutes.REGISTRATION || tab === TabRoutes.LOGIN)) {
+            changeTab(TabRoutes.MAIN);
         }
     }, [login]);
 
@@ -57,13 +64,12 @@ export const App = (): JSX.Element => {
 
                         <Tabs value={tab}
                               onChange={(e, value: TabRoutes) => {
-                                  setTab(value);
-                                  history.push(value);
+                                  changeTab(value);
                               }}>
                             <Tab label='Главная' value={TabRoutes.MAIN}/>
                             {!login && (<Tab label='Регистрация' value={TabRoutes.REGISTRATION}/>)}
+                            {!login && (<Tab label='Вход' value={TabRoutes.LOGIN}/>)}
                             <Tab label='Сервера' value={TabRoutes.SERVERS}/>
-
 
                         </Tabs>
 
@@ -71,17 +77,27 @@ export const App = (): JSX.Element => {
                     </Stack>
 
                     <TabPanel value={TabRoutes.MAIN}>
-                        <MainView />
+                        <MainView setTab={(value: TabRoutes) => {
+                            changeTab(value);
+                        }}/>
                     </TabPanel>
                     <TabPanel value={TabRoutes.REGISTRATION}>
                         <Registration onRegister={name => {
                             setLogin(name);
-                            setTab(TabRoutes.MAIN);
+                            changeTab(TabRoutes.MAIN);
                         }}/>
                     </TabPanel>
-                    <TabPanel value={TabRoutes.SERVERS}>
-                        Item Three
+                    <TabPanel value={TabRoutes.LOGIN}>
+                        <Login onLogin={name => {
+                            setLogin(name);
+                            changeTab(TabRoutes.MAIN);
+                        }}/>
                     </TabPanel>
+
+                    <TabPanel value={TabRoutes.SERVERS}>
+                        <ServersView/>
+                    </TabPanel>
+
                 </TabContext>
             </div>
         </BrowserRouter>

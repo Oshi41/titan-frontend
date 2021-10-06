@@ -5,14 +5,16 @@ import {useControlledCookieState} from "../hook/useControlledCookieState";
 import {LoadingButton} from "@mui/lab";
 import SendIcon from '@mui/icons-material/Send';
 import * as api from "../api/1.0";
+import {StoreType} from '../types';
 
 interface Props {
     onLogin: (login: string) => void;
+    store: StoreType | undefined;
 }
 
 export const Login = (props: Props): JSX.Element => {
 
-    const [login, setLogin] = useControlledCookieState('titan_login_login', '');
+    const [login, setLogin]= useControlledCookieState('titan_login_login', '');
     const [pass, setPass] = useControlledCookieState('titan_login_pass', '');
 
     const [loginErr, setLoginErr] = React.useState<string | undefined>(undefined);

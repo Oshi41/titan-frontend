@@ -7,26 +7,38 @@ import FingerprintIcon from '@mui/icons-material/Fingerprint';
 import PermIdentityIcon from '@mui/icons-material/PermIdentity';
 import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
 import {TabRoutes} from '../App';
+import {StoreType} from '../types';
 
 interface Props {
     setTab: (tab: TabRoutes) => void;
+    store: StoreType | undefined;
 }
 
 export const MainView = (props: Props): JSX.Element => {
 
     const [login, setLogin] = useControlledCookieState('titan_login', '');
-    
+
     return (
         <Grid container
               direction="column"
               justifyContent="space-between"
               alignItems="flex-start"
               rowSpacing={1}>
+
             <Grid item>
                 <Typography sx={{fontSize: 24}} gutterBottom>
                     Добро пожаловать на проект Titan!
                 </Typography>
             </Grid>
+
+            {props.store === 'ely.by' && (
+                <Grid item>
+                    <Typography sx={{fontSize: 18}} gutterBottom>
+                        Проект использует авторизацию ely.by. Чтобы играть на проекте, необходимо использовать
+                        существующий аккаунт.
+                    </Typography>
+                </Grid>
+            )}
 
             {!login && (
                 <Grid item>
@@ -50,15 +62,16 @@ export const MainView = (props: Props): JSX.Element => {
                 </Grid>
             )}
 
-
-            <Grid item>
-                <Button variant="contained"
-                        onClick={() => api.get('/launcher', ['file', 'TitanLauncher.jar'])}
-                        sx={{fontSize: 18}}
-                        endIcon={<SportsEsportsIcon/>}>
-                    Скачать лаунчер
-                </Button>
-            </Grid>
+            {login && (
+                <Grid item>
+                    <Button variant="contained"
+                            onClick={() => api.get('/launcher', ['file', 'TitanLauncher.jar'])}
+                            sx={{fontSize: 18}}
+                            endIcon={<SportsEsportsIcon/>}>
+                        Скачать лаунчер
+                    </Button>
+                </Grid>
+            )}
 
         </Grid>
     );

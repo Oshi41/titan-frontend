@@ -67,3 +67,8 @@ export interface ServerDesciption {
     forge: ForgeInfo,
     extra: ExtraServerInfo,
 }
+
+/**
+ * Тип хранилища
+ */
+export type StoreType = 'sqlite' | 'ely.by';

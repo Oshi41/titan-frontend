@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {BrowserRouter} from "react-router-dom";
-import { initialize } from './api/1.0';
 import {App} from './App';
 import reportWebVitals from './reportWebVitals';
 
@@ -18,5 +17,3 @@ ReactDOM.render(
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
-
-initialize();

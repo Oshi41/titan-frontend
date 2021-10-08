@@ -1,28 +1,4 @@
-export let BaseUrl = '';
-const apiVersion = '/api/1.0';
-
-/**
- * Устанавливаю правильный адрес (при первом запуске!)
- */
-export const initialize = () => {
-    if (BaseUrl){
-        return;
-    }
-
-    fetch('https://geolocation-db.com/json')
-      .then(x => {
-          console.log(x);
-          if (x.status !== 200){
-              throw new Error('Wrong answer');
-          }
-          return x.json();
-      })
-      .then((x: {IPv4: string}) => {
-          console.log(x);
-          BaseUrl = `http://${x.IPv4}` + apiVersion;
-      })
-      .catch(x => console.log(x));
-}
+export let BaseUrl = '/api/1.0';
 
 /**
  * Post с json контентом

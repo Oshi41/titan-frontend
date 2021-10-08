@@ -1,4 +1,28 @@
-const baseUrl = 'http://localhost:5001/api/1.0';
+export let BaseUrl = '';
+const apiVersion = '/api/1.0';
+
+/**
+ * Устанавливаю правильный адрес (при первом запуске!)
+ */
+export const initialize = () => {
+    if (BaseUrl){
+        return;
+    }
+
+    fetch('https://geolocation-db.com/json')
+      .then(x => {
+          console.log(x);
+          if (x.status !== 200){
+              throw new Error('Wrong answer');
+          }
+          return x.json();
+      })
+      .then((x: {IPv4: string}) => {
+          console.log(x);
+          BaseUrl = `http://${x.IPv4}` + apiVersion;
+      })
+      .catch(x => console.log(x));
+}
 
 /**
  * Post с json контентом
@@ -6,7 +30,7 @@ const baseUrl = 'http://localhost:5001/api/1.0';
  * @param content - json объект запроса
  */
 export const postJson = (url: string, content: any): Promise<Response> => {
-    return fetch(baseUrl + url, {
+    return fetch(BaseUrl + url, {
         body: JSON.stringify(content),
         method: 'POST',
         headers: {
@@ -27,7 +51,7 @@ export const get = (url: string, ...params: [string, string][]): Promise<Respons
         url += '?' + qPrams.toString();
     }
 
-    return fetch(baseUrl + url);
+    return fetch(BaseUrl + url);
 }
 
 /**

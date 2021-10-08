@@ -8,6 +8,7 @@ import PermIdentityIcon from '@mui/icons-material/PermIdentity';
 import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
 import {TabRoutes} from '../App';
 import {StoreType} from '../types';
+import { BaseUrl } from '../api/1.0';
 
 interface Props {
     setTab: (tab: TabRoutes) => void;
@@ -19,22 +20,27 @@ export const MainView = (props: Props): JSX.Element => {
     const [login, setLogin] = useControlledCookieState('titan_login', '');
 
     const onClick = React.useCallback(() => {
-        api.get('/launcher', ['file', 'Titan Launcher.jar'])
-            .then(x => {
-                if (x.status == 200){
-                    return x.blob();
-                }
-
-                throw new Error(x.status + '');
-            })
-            .then(x => {
-                const url = window.URL.createObjectURL(x);
-                const link = document.createElement('a');
-                link.href = url;
-                link.setAttribute('download', 'Titan Launcher.jar');
-                document.body.appendChild(link);
-                link.click();
-            });
+        const filename = 'Titan Launcher.jar';
+        const a = document.createElement("a");
+        a.href = BaseUrl + '?' + new URLSearchParams([['file', filename]]).toString();
+        a.setAttribute("download", filename);
+        a.click();
+        // api.get('/launcher', ['file', 'Titan Launcher.jar'])
+        //     .then(x => {
+        //         if (x.status == 200){
+        //             return x.blob();
+        //         }
+        //
+        //         throw new Error(x.status + '');
+        //     })
+        //     .then(x => {
+        //         const url = window.URL.createObjectURL(x);
+        //         const link = document.createElement('a');
+        //         link.href = url;
+        //         link.setAttribute('download', 'Titan Launcher.jar');
+        //         document.body.appendChild(link);
+        //         link.click();
+        //     });
     }, []);
 
     return (

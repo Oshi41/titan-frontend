@@ -22,7 +22,7 @@ export const MainView = (props: Props): JSX.Element => {
     const onClick = React.useCallback(() => {
         const filename = 'Titan Launcher.jar';
         const a = document.createElement("a");
-        a.href = BaseUrl + '?' + new URLSearchParams([['file', filename]]).toString();
+        a.href = BaseUrl + '/download?' + new URLSearchParams([['file', filename]]).toString();
         a.setAttribute("download", filename);
         a.click();
         // api.get('/launcher', ['file', 'Titan Launcher.jar'])

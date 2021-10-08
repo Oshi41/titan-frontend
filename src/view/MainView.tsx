@@ -18,6 +18,25 @@ export const MainView = (props: Props): JSX.Element => {
 
     const [login, setLogin] = useControlledCookieState('titan_login', '');
 
+    const onClick = React.useCallback(() => {
+        api.get('/launcher', ['file', 'Titan Launcher.jar'])
+            .then(x => {
+                if (x.status == 200){
+                    return x.blob();
+                }
+
+                throw new Error(x.status + '');
+            })
+            .then(x => {
+                const url = window.URL.createObjectURL(x);
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', 'Titan Launcher.jar');
+                document.body.appendChild(link);
+                link.click();
+            });
+    }, []);
+
     return (
         <Grid container
               direction="column"
@@ -65,7 +84,7 @@ export const MainView = (props: Props): JSX.Element => {
             {login && (
                 <Grid item>
                     <Button variant="contained"
-                            onClick={() => api.get('/launcher', ['file', 'TitanLauncher.jar'])}
+                            onClick={onClick}
                             sx={{fontSize: 18}}
                             endIcon={<SportsEsportsIcon/>}>
                         Скачать лаунчер

@@ -82,7 +82,7 @@ export const Registration = (props: Props): JSX.Element => {
             login,
             pass
         }).then(x => {
-            if (x.status != 200) {
+            if (x.status !== 200) {
                 setRegCompleted(false);
                 return x.text().then(x => {
                     throw new Error(x)
@@ -91,15 +91,11 @@ export const Registration = (props: Props): JSX.Element => {
 
             return x.text();
         }).then(x => {
-            const completed = x === 'OK';
-            setRegCompleted(completed);
-
-            if (completed) {
-                props.onRegister(login);
-                setLogin('');
-                setPass('');
-                setPass2('');
-            }
+            setRegCompleted(true);
+            props.onRegister(login);
+            setLogin('');
+            setPass('');
+            setPass2('');
         })
             .catch(x => {
                 console.log(x);

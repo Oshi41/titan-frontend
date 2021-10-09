@@ -30,7 +30,7 @@ export const ServersView = (): JSX.Element => {
       .then(x => {
         const addresses = x as string[];
 
-        const promises = addresses.map(x => api.get('/server', [ 'server', x ]).then(x => {
+        const promises = addresses.map(x => api.get('/server', [ 'address', x ]).then(x => {
           if (x.status !== 200) {
             return x.json().then(y => {
               console.log(y);

@@ -1,4 +1,4 @@
-export let BaseUrl = '/api/1.0';
+export let BaseUrl = 'http://vm2775977.33ssd.had.wf/api/1.0';
 
 /**
  * Post с json контентом

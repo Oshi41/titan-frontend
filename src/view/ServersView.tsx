@@ -150,7 +150,7 @@ const getControl = (s: ServerDesciption): JSX.Element => {
 
             {forge?.players?.sample?.length > 0 && (
                 <Grid item>
-                    <Accordion>
+                    <Accordion defaultExpanded={true}>
                         <AccordionSummary
                             expandIcon={<ExpandMoreIcon/>}
                             aria-controls="panel1a-content"
@@ -162,7 +162,7 @@ const getControl = (s: ServerDesciption): JSX.Element => {
                             <Stack spacing={2} direction='column'>
                                 {forge.players.sample.map(x => x.name).sort((a, b) => a.localeCompare(b)).map(x => (
                                     <Typography sx={{fontSize: 16}} gutterBottom>{x}</Typography>
-                                ))};
+                                ))}
                             </Stack>
                         </AccordionDetails>
                     </Accordion>

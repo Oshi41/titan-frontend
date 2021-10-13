@@ -1,6 +1,6 @@
 import {getBearer, setBearer} from "../../utils";
 
-export let BaseUrl = 'http://localhost:5002/api/1.0';
+export let BaseUrl = '/api/1.0';
 const auth_header = 'Authorization';
 
 /**

@@ -6,6 +6,7 @@ import {LoadingButton} from "@mui/lab";
 import SendIcon from '@mui/icons-material/Send';
 import * as api from "../api/1.0";
 import {StoreType} from '../types';
+import {setBearer} from "../utils/index";
 
 interface Props {
   onLogin: (login: string) => void;
@@ -32,15 +33,18 @@ export const Login = (props: Props): JSX.Element => {
     api.get('/login', ['login', login], ['pass', pass], ['token', ''])
       .then(x => {
         if (x.status !== 200) {
-          return x.json()
+          return x.text()
             .then(x => {
               throw new Error(x)
             });
         }
 
-        return x.json();
+        return x.text();
       })
-      .then(x => props.onLogin(login))
+      .then(x => {
+        setBearer(x);
+        props.onLogin(login);
+      })
       .catch(x => {
         console.log(x);
         setLoginErr('Логин или пароль неверен');

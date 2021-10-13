@@ -8,172 +8,153 @@ import {ModalDialog} from "./view/ModalDialog";
 import {Registration} from "./view/Registration";
 import {Login} from "./view/Login";
 import {ServersView} from "./view/ServersView";
-import {StoreType} from './types';
-import * as api from './api/1.0';
+import {NewsItem, Roles, StoreType, UserAuthType} from './types';
 import CircularProgress from '@mui/material/CircularProgress/CircularProgress';
-
+import {getToken, setBearer} from "./utils";
+import { NewsEdit } from "./view/NewsEdit";
 
 export enum TabRoutes {
-    MAIN = '/main',
-    REGISTRATION = '/registration',
-    LOGIN = '/login',
-    SERVERS = '/servers',
+  MAIN = '/main',
+  REGISTRATION = '/registration',
+  LOGIN = '/login',
+  SERVERS = '/servers',
+  NEWS_EDIT = '/news_edit',
 }
 
 export const App = (): JSX.Element => {
-    let history = useHistory();
+  let history = useHistory();
 
-    const [login, setLogin] = useControlledCookieState('titan_login', '');
-    const [tab, setTab] = useControlledCookieState<TabRoutes>('titan_tab', TabRoutes.MAIN);
+  const [tab, setTab] = useControlledCookieState<TabRoutes>('titan_tab', TabRoutes.MAIN);
+  const [storeType, setStoreType] = React.useState<StoreType | undefined>('sqlite');
+  const token = getToken();
 
-    const [storeType, setStoreType] = React.useState<StoreType | undefined>(undefined);
+  const [loading, setLoading] = React.useState(false);
+  const [showLogOut, setShowLogOut] = React.useState(false);
 
-    const [loading, setLoading] = React.useState(false);
-    const [showLogOut, setShowLogOut] = React.useState(false);
+  const changeTab = React.useCallback((t: TabRoutes) => {
 
-    const changeTab = React.useCallback((t: TabRoutes) => {
+    if (storeType == 'ely.by' && t === TabRoutes.REGISTRATION) {
+      window.location.href = 'https://account.ely.by/register';
+      return;
+    }
 
-        if (storeType == 'ely.by' && t === TabRoutes.REGISTRATION) {
-            window.location.href = 'https://account.ely.by/register';
-            return;
-        }
+    setTab(t);
+    history.push(t);
+  }, [storeType]);
 
-        setTab(t);
-        history.push(t);
-    }, [storeType]);
+  // В случае успешного входа, надо  перейти с не нужных табов
+  React.useEffect(() => {
+    if (token?.login && (tab === TabRoutes.REGISTRATION || tab === TabRoutes.LOGIN)) {
+      changeTab(TabRoutes.MAIN);
+    }
+  }, [token?.login]);
 
-    // В случае успешного входа, надо  перейти с не нужных табов
-    React.useEffect(() => {
-        if (login && (tab === TabRoutes.REGISTRATION || tab === TabRoutes.LOGIN)) {
-            changeTab(TabRoutes.MAIN);
-        }
-    }, [login]);
+  const tabs = React.useMemo(() => {
+    const result: JSX.Element[] = [<Tab label='Главная' value={TabRoutes.MAIN}/>];
 
-    // запрашиваю тип хранения
-    React.useEffect(() => {
-        setLoading(true);
+    const add = storeType === 'ely.by'
+      ? 'Ely.by'
+      : '';
 
-        api.get('/storeType')
-            .then(x => {
-                if (x.status !== 200) {
-                    return x.text().then(y => {
-                        console.log(y);
-                        throw new Error(y);
-                    });
-                }
-
-                return x.text();
-            })
-            .then(x => setStoreType(x as StoreType))
-            .catch(x => {
-                console.log(x);
-                setStoreType(undefined);
-            })
-            .finally(() => setLoading(false));
-    }, []);
-
-    const tabs = React.useMemo(() => {
-        const result: JSX.Element[] = [<Tab label='Главная' value={TabRoutes.MAIN}/>];
-
-        const add = storeType === 'ely.by'
-            ? 'Ely.by'
-            : '';
-
-        if (!login) {
-            if (!login) {
-                result.push(
-                    <Tab label={`Регистрация ${add}`} value={TabRoutes.REGISTRATION}/>,
-                    <Tab label={`Вход ${add}`} value={TabRoutes.LOGIN}/>
-                );
-            }
-        }
+    if (!token?.login) {
+      result.push(
+        <Tab label={`Регистрация ${add}`} value={TabRoutes.REGISTRATION}/>,
+        <Tab label={`Вход ${add}`} value={TabRoutes.LOGIN}/>
+      );
+    }
 
 
-        result.push(<Tab label='Сервера' value={TabRoutes.SERVERS}/>);
-        return result;
-    }, [login, storeType]);
+    result.push(<Tab label='Сервера' value={TabRoutes.SERVERS}/>);
 
-    const avatar = React.useMemo(() => {
-        if (!login) {
-            return undefined;
-        }
+    if (token?.roles?.includes(Roles.Moderator)) {
+      result.push(<Tab label='Редактор новостей' value={TabRoutes.NEWS_EDIT}/>);
+    }
+    return result;
+  }, [token?.login, storeType]);
 
-        switch (storeType) {
-            case 'sqlite':
-                return <Avatar>own</Avatar>;
+  const avatar = React.useMemo(() => {
+    if (!token?.auth) {
+      return undefined;
+    }
 
-            case 'ely.by':
-                return <Avatar variant='square'
-                               src='https://avatars.githubusercontent.com/u/15382302?s=200&v=4'/>;
-        }
+    switch (token.auth) {
+      case UserAuthType.Own:
+        return <Avatar>own</Avatar>;
 
-        return undefined;
-    }, [storeType, login]);
+      case UserAuthType.ElyBy:
+        return <Avatar variant='square'
+                       src='https://avatars.githubusercontent.com/u/15382302?s=200&v=4'/>;
+    }
 
-    return (
-        <BrowserRouter>
-            <div>
-                <Backdrop
-                    sx={{color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1}}
-                    open={loading}>
-                    <CircularProgress color="inherit"/>
-                </Backdrop>
+    return undefined;
+  }, [storeType, token?.auth]);
 
-                <TabContext value={tab}>
-                    <Stack direction="row"
-                           spacing={2}
-                           sx={{borderBottom: 1, borderColor: 'divider', mt: 1, ml: 1}}>
-                        {login && (
-                            <>
-                                <Chip label={'Текущий пользователь: ' + login}
-                                      avatar={avatar}
-                                      sx={{ml: 1, mt: 1, mb: 1}}
-                                      onDelete={() => setShowLogOut(true)}/>
+  return (
+    <BrowserRouter>
+      <div>
+        <Backdrop
+          sx={{color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1}}
+          open={loading}>
+          <CircularProgress color="inherit"/>
+        </Backdrop>
 
-
-                                <Divider orientation="vertical" flexItem/>
-                            </>
-                        )}
-
-                        <ModalDialog open={showLogOut}
-                                     close={() => setShowLogOut(false)}
-                                     onAction={() => setLogin('')}
-                                     title='Подтверждение'
-                                     description={`Вы точно хотите выйти из аккаунта ${login}?`}
-                        />
+        <TabContext value={tab}>
+          <Stack direction="row"
+                 spacing={2}
+                 sx={{borderBottom: 1, borderColor: 'divider', mt: 1, ml: 1}}>
+            {token?.login && (
+              <>
+                <Chip label={'Текущий пользователь: ' + token?.login}
+                      avatar={avatar}
+                      sx={{ml: 1, mt: 1, mb: 1}}
+                      onDelete={() => setShowLogOut(true)}/>
 
 
-                        <Tabs value={tab}
-                              onChange={(e, value: TabRoutes) => {
-                                  changeTab(value);
-                              }}>{tabs}</Tabs>
+                <Divider orientation="vertical" flexItem/>
+              </>
+            )}
+
+            <ModalDialog open={showLogOut}
+                         close={() => setShowLogOut(false)}
+                         onAction={() => setBearer('')}
+                         title='Подтверждение'
+                         description={`Вы точно хотите выйти из аккаунта ${token?.login}?`}
+            />
 
 
-                    </Stack>
+            <Tabs value={tab}
+                  onChange={(e, value: TabRoutes) => {
+                    changeTab(value);
+                  }}>{tabs}</Tabs>
 
-                    <TabPanel value={TabRoutes.MAIN}>
-                        <MainView setTab={changeTab} store={storeType}/>
-                    </TabPanel>
-                    <TabPanel value={TabRoutes.REGISTRATION}>
-                        <Registration onRegister={name => {
-                            setLogin(name);
-                            changeTab(TabRoutes.MAIN);
-                        }}/>
-                    </TabPanel>
-                    <TabPanel value={TabRoutes.LOGIN}>
-                        <Login store={storeType}
-                               onLogin={name => {
-                                   setLogin(name);
-                                   changeTab(TabRoutes.MAIN);
-                               }}/>
-                    </TabPanel>
 
-                    <TabPanel value={TabRoutes.SERVERS}>
-                        <ServersView/>
-                    </TabPanel>
+          </Stack>
 
-                </TabContext>
-            </div>
-        </BrowserRouter>
-    );
+          <TabPanel value={TabRoutes.MAIN}>
+            <MainView setTab={changeTab} store={storeType}/>
+          </TabPanel>
+          <TabPanel value={TabRoutes.REGISTRATION}>
+            <Registration onRegister={name => {
+              changeTab(TabRoutes.MAIN);
+            }}/>
+          </TabPanel>
+          <TabPanel value={TabRoutes.LOGIN}>
+            <Login store={storeType}
+                   onLogin={name => {
+                     changeTab(TabRoutes.MAIN);
+                   }}/>
+          </TabPanel>
+
+          <TabPanel value={TabRoutes.SERVERS}>
+            <ServersView/>
+          </TabPanel>
+
+          <TabPanel value={TabRoutes.SERVERS}>
+            <NewsEdit source={{} as NewsItem}/>
+          </TabPanel>
+
+        </TabContext>
+      </div>
+    </BrowserRouter>
+  );
 };

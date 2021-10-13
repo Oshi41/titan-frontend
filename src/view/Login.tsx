@@ -8,95 +8,89 @@ import * as api from "../api/1.0";
 import {StoreType} from '../types';
 
 interface Props {
-    onLogin: (login: string) => void;
-    store: StoreType | undefined;
+  onLogin: (login: string) => void;
+  store: StoreType | undefined;
 }
 
 export const Login = (props: Props): JSX.Element => {
 
-    const [login, setLogin]= useControlledCookieState('titan_login_login', '');
-    const [pass, setPass] = useControlledCookieState('titan_login_pass', '');
+  const [login, setLogin] = useControlledCookieState('log_login', '');
+  const [pass, setPass] = useControlledCookieState('log_pass', '');
 
-    const [loginErr, setLoginErr] = React.useState<string | undefined>(undefined);
+  const [loginErr, setLoginErr] = React.useState<string | undefined>(undefined);
 
-    // сбиваю ошибку в логине
-    React.useEffect(() => {
-        setLoginErr(undefined);
-    }, [login]);
+  // сбиваю ошибку в логине
+  React.useEffect(() => {
+    setLoginErr(undefined);
+  }, [login]);
 
-    const [sending, setSending] = React.useState(false);
+  const [sending, setSending] = React.useState(false);
 
-    const onRegister = React.useCallback(() => {
-        setSending(true);
+  const onRegister = React.useCallback(() => {
+    setSending(true);
 
-        api.get('/login', ['login', login], ['pass', pass])
+    api.get('/login', ['login', login], ['pass', pass], ['token', ''])
+      .then(x => {
+        if (x.status !== 200) {
+          return x.json()
             .then(x => {
-                if (x.status !== 200) {
-                    return x.text().then(x => {
-                        throw new Error(x)
-                    });
-                }
+              throw new Error(x)
+            });
+        }
 
-                return x.text();
-            })
-            .then(x => {
-                if (x === 'OK:' + login) {
-                    return 'OK';
-                }
+        return x.json();
+      })
+      .then(x => props.onLogin(login))
+      .catch(x => {
+        console.log(x);
+        setLoginErr('Логин или пароль неверен');
+      })
+      .finally(() => setSending(false));
 
-                throw new Error(x);
-            })
-            .then(x => props.onLogin(login))
-            .catch(x => {
-                console.log(x);
-                setLoginErr('Логин или пароль неверен');
-            })
-            .finally(() => setSending(false));
+  }, [login, pass]);
 
-    }, [login, pass]);
+  return (
+    <Grid container
+          direction='column'
+          justifyContent="flex-start"
+          alignItems="left"
+          spacing={2}>
 
-    return (
-        <Grid container
-              direction='column'
-              justifyContent="flex-start"
-              alignItems="left"
-              spacing={2}>
+      <Grid item xs={6}>
+        <TextField required
+                   autoComplete='username'
+                   defaultValue={login}
+                   onChange={e => setLogin(e.target.value)}
+                   id='login_field'
+                   label='Имя пользователя'
+                   error={loginErr !== undefined}
+                   helperText={loginErr ?? 'Введите имя пользователя'}
+        />
+      </Grid>
 
-            <Grid item xs={6}>
-                <TextField required
-                           autoComplete='username'
-                           defaultValue={login}
-                           onChange={e => setLogin(e.target.value)}
-                           id='login_field'
-                           label='Имя пользователя'
-                           error={loginErr !== undefined}
-                           helperText={loginErr ?? 'Введите имя пользователя'}
-                />
-            </Grid>
+      <Grid item xs={6}>
+        <TextField required
+                   type='password'
+                   autoComplete='current-password'
+                   defaultValue={pass}
+                   onChange={e => setPass(e.target.value)}
+                   id='password_field'
+                   label='Пароль'
+                   helperText={'Введите свой пароль'}
+        />
+      </Grid>
 
-            <Grid item xs={6}>
-                <TextField required
-                           type='password'
-                           autoComplete='current-password'
-                           defaultValue={pass}
-                           onChange={e => setPass(e.target.value)}
-                           id='password_field'
-                           label='Пароль'
-                           helperText={'Введите свой пароль'}
-                />
-            </Grid>
-
-            <Grid item>
-                <LoadingButton loading={sending}
-                               onClick={onRegister}
-                               variant="contained"
-                               loadingPosition="end"
-                               disabled={!login || !pass}
-                               endIcon={<SendIcon/>}
-                >
-                    Войти
-                </LoadingButton>
-            </Grid>
-        </Grid>
-    );
+      <Grid item>
+        <LoadingButton loading={sending}
+                       onClick={onRegister}
+                       variant="contained"
+                       loadingPosition="end"
+                       disabled={!login || !pass}
+                       endIcon={<SendIcon/>}
+        >
+          Войти
+        </LoadingButton>
+      </Grid>
+    </Grid>
+  );
 }

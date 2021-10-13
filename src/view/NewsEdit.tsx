@@ -11,10 +11,6 @@ export const NewsEdit = (props: Props): JSX.Element => {
   const [copy, setCopy] = React.useState<NewsItem>();
   React.useEffect(() => setCopy({...props?.source}), [props.source]);
 
-  const onSave = (data: string) => {
-    console.log(data)
-  }
-
   return (
     <Stack direction='column'
            spacing={2}>
@@ -26,11 +22,6 @@ export const NewsEdit = (props: Props): JSX.Element => {
         helperText="Введите название новости"
       />
 
-      <Editor
-        document={copy?.html ?? ''}
-        onChange={(document) => setCopy({...copy, html: document})}
-        onBlur={(html) => console.log(html)}
-      />
     </Stack>
   );
 };

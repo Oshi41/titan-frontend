@@ -148,3 +148,38 @@ export interface NewsItem {
    */
   image: Blob;
 }
+
+/**
+ * Описание пользователя
+ */
+export interface SqlUser {
+  /**
+   * Логин
+   */
+  login: string;
+
+  /**
+   * Пароль
+   */
+  pass: string;
+
+  /**
+   * UUID пользователя
+   */
+  uuid: string;
+
+  /**
+   * токен доступа
+   */
+  access: string;
+
+  /**
+   * Сервер
+   */
+  server?: string;
+
+  /**
+   * IP регистрации
+   */
+  ip?: string;
+}

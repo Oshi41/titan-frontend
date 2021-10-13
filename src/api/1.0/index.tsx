@@ -7,13 +7,10 @@ const auth_header = 'Authorization';
  * Получаю дефолные заголовки
  */
 const getBaseHeaders = (): HeadersInit => {
-  const bearer = getBearer();
-  if (!bearer) {
-    return {};
-  }
-
   return {
-    Authorization: bearer
+    'Access-Control-Allow-Origin': '*',
+    'access-control-expose-headers': '*',
+    Authorization: getBearer(),
   };
 }
 

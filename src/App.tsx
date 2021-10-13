@@ -12,6 +12,7 @@ import {NewsItem, Roles, StoreType, UserAuthType} from './types';
 import CircularProgress from '@mui/material/CircularProgress/CircularProgress';
 import {getToken, setBearer} from "./utils";
 import { NewsEdit } from "./view/NewsEdit";
+import {UsersEdit} from "./view/UsersEdit";
 
 export enum TabRoutes {
   MAIN = '/main',
@@ -19,6 +20,7 @@ export enum TabRoutes {
   LOGIN = '/login',
   SERVERS = '/servers',
   NEWS_EDIT = '/news_edit',
+  USERS_EDIT = '/users_edit',
 }
 
 export const App = (): JSX.Element => {
@@ -68,6 +70,7 @@ export const App = (): JSX.Element => {
 
     if (token?.roles?.includes(Roles.Moderator)) {
       result.push(<Tab label='Редактор новостей' value={TabRoutes.NEWS_EDIT}/>);
+      result.push(<Tab label='Редактор пользователей' value={TabRoutes.USERS_EDIT}/>);
     }
     return result;
   }, [token?.login, storeType]);
@@ -149,8 +152,12 @@ export const App = (): JSX.Element => {
             <ServersView/>
           </TabPanel>
 
-          <TabPanel value={TabRoutes.SERVERS}>
+          <TabPanel value={TabRoutes.NEWS_EDIT}>
             <NewsEdit source={{} as NewsItem}/>
+          </TabPanel>
+
+          <TabPanel value={TabRoutes.USERS_EDIT}>
+            <UsersEdit/>
           </TabPanel>
 
         </TabContext>

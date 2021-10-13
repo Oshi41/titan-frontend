@@ -16,7 +16,7 @@ export const getBearer = (): string => {
  */
 export const setBearer = (s: string) => {
   if (s) {
-    Cookies.set(bearer_name, s, {sameSite: 'Strict', secure: true});
+    Cookies.set(bearer_name, s);
   } else {
     Cookies.remove(bearer_name);
   }

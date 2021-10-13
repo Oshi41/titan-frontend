@@ -5,6 +5,7 @@ import {Grid, InputAdornment, TextField} from "@mui/material";
 import * as React from 'react';
 import * as api from "../api/1.0";
 import {useControlledCookieState} from "../hook/useControlledCookieState";
+import {setBearer} from "../utils/index";
 import {ModalDialog} from "./ModalDialog";
 
 interface Props {
@@ -88,9 +89,10 @@ export const Registration = (props: Props): JSX.Element => {
             });
         }
 
-        return x.json();
+        return x.text();
       })
       .then(x => {
+        setBearer(x);
         setRegCompleted(true);
         props.onRegister(login);
         setLogin('');

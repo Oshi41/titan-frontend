@@ -1,17 +1,17 @@
-import {Backdrop, Chip, Divider, Stack, Tab, Tabs, Avatar} from "@mui/material";
 import {TabContext, TabPanel} from '@mui/lab';
+import {Avatar, Backdrop, Chip, Divider, Stack, Tab, Tabs} from "@mui/material";
+import CircularProgress from '@mui/material/CircularProgress/CircularProgress';
 import React from 'react';
-import {BrowserRouter, Switch, Route, useHistory} from 'react-router-dom';
+import {BrowserRouter, useHistory} from 'react-router-dom';
 import {useControlledCookieState} from "./hook/useControlledCookieState";
+import {NewsItem, Roles, StoreType, UserAuthType} from './types';
+import {getToken, setBearer} from "./utils";
+import {Login} from "./view/Login";
 import {MainView} from "./view/MainView";
 import {ModalDialog} from "./view/ModalDialog";
+import {NewsEdit} from "./view/NewsEdit";
 import {Registration} from "./view/Registration";
-import {Login} from "./view/Login";
 import {ServersView} from "./view/ServersView";
-import {NewsItem, Roles, StoreType, UserAuthType} from './types';
-import CircularProgress from '@mui/material/CircularProgress/CircularProgress';
-import {getToken, setBearer} from "./utils";
-import { NewsEdit } from "./view/NewsEdit";
 import {UsersEdit} from "./view/UsersEdit";
 
 export enum TabRoutes {
@@ -49,6 +49,11 @@ export const App = (): JSX.Element => {
     if (token?.login && (tab === TabRoutes.REGISTRATION || tab === TabRoutes.LOGIN)) {
       changeTab(TabRoutes.MAIN);
     }
+
+    if ((!token?.login || !token.roles.includes(Roles.Moderator)) && (tab === TabRoutes.NEWS_EDIT || tab === TabRoutes.USERS_EDIT)){
+      changeTab(TabRoutes.MAIN);
+    }
+
   }, [token?.login]);
 
   const tabs = React.useMemo(() => {

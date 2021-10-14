@@ -58,6 +58,15 @@ export const AllCrashesView = (): JSX.Element => {
       },
     },
     {
+      name: 'file',
+      label: 'Имя файла',
+      options: {
+        sort: true,
+        filter: true,
+        display: 'false'
+      }
+    },
+    {
       name: 'date',
       label: 'Дата создания',
       options: {
@@ -102,7 +111,7 @@ export const AllCrashesView = (): JSX.Element => {
         filter: false,
         customBodyRender: (value: any, tableMeta: MUIDataTableMeta, updateValue: (value: string) => void) => {
           // @ts-ignore
-          let [login, a, b, file] = tableMeta.tableData[tableMeta.rowIndex];
+          let [login, file] = tableMeta.tableData[tableMeta.rowIndex];
 
           const report = {
             login: login as string,

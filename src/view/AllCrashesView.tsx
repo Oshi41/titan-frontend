@@ -47,6 +47,7 @@ export const AllCrashesView = (): JSX.Element => {
       .catch(x => console.log(x));
   }, [refresh]);
 
+  // Порядок не менять, он важен!
   const columns: MUIDataTableColumnDef[] = [
     {
       name: 'login',
@@ -63,8 +64,16 @@ export const AllCrashesView = (): JSX.Element => {
       options: {
         sort: true,
         filter: true,
-        display: 'false'
       }
+    },
+    {
+      name: 'content',
+      label: 'Содержание',
+      options: {
+        sort: true,
+        filter: true,
+        display: 'false'
+      },
     },
     {
       name: 'date',
@@ -92,15 +101,6 @@ export const AllCrashesView = (): JSX.Element => {
             maxRows={15}
           />
         }
-      },
-    },
-    {
-      name: 'content',
-      label: 'Содержание',
-      options: {
-        sort: true,
-        filter: true,
-        display: 'false'
       },
     },
     {
@@ -140,6 +140,7 @@ export const AllCrashesView = (): JSX.Element => {
                       download: 'false',
                       renderExpandableRow: (rowData, rowMeta) => {
                         const colSpan = rowData.length + 1;
+                        const [a, b, content] = rowData;
 
                         return <TableRow>
                           <TableCell colSpan={colSpan}>
@@ -147,7 +148,7 @@ export const AllCrashesView = (): JSX.Element => {
                               sx={{display: 'flex'}}
                               id="text_field"
                               label="Содержимое файла"
-                              value={rowData[3]}
+                              value={content}
                               disabled
                               multiline
                               rows={15}

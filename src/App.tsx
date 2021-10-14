@@ -9,7 +9,7 @@ import {getToken, setBearer} from "./utils";
 import {Login} from "./view/Login";
 import {MainView} from "./view/MainView";
 import {ModalDialog} from "./view/ModalDialog";
-import {NewsEdit} from "./view/NewsEdit";
+import {AddNews} from "./view/AddNews";
 import {Registration} from "./view/Registration";
 import {ServersView} from "./view/ServersView";
 import {UsersEdit} from "./view/UsersEdit";
@@ -19,7 +19,7 @@ export enum TabRoutes {
   REGISTRATION = '/registration',
   LOGIN = '/login',
   SERVERS = '/servers',
-  NEWS_EDIT = '/news_edit',
+  ADD_NEWS = '/add_news',
   USERS_EDIT = '/users_edit',
 }
 
@@ -50,7 +50,7 @@ export const App = (): JSX.Element => {
       changeTab(TabRoutes.MAIN);
     }
 
-    if ((!token?.login || !token.roles.includes(Roles.Moderator)) && (tab === TabRoutes.NEWS_EDIT || tab === TabRoutes.USERS_EDIT)){
+    if ((!token?.login || !token.roles.includes(Roles.Moderator)) && (tab === TabRoutes.ADD_NEWS || tab === TabRoutes.USERS_EDIT)){
       changeTab(TabRoutes.MAIN);
     }
 
@@ -74,8 +74,8 @@ export const App = (): JSX.Element => {
     result.push(<Tab label='Сервера' value={TabRoutes.SERVERS}/>);
 
     if (token?.roles?.includes(Roles.Moderator)) {
-      result.push(<Tab label='Редактор новостей' value={TabRoutes.NEWS_EDIT}/>);
-      result.push(<Tab label='Редактор пользователей' value={TabRoutes.USERS_EDIT}/>);
+      result.push(<Tab label='Добавление новостей' value={TabRoutes.ADD_NEWS}/>);
+      // result.push(<Tab label='Редактор пользователей' value={TabRoutes.USERS_EDIT}/>);
     }
     return result;
   }, [token?.login, storeType]);
@@ -157,8 +157,8 @@ export const App = (): JSX.Element => {
             <ServersView/>
           </TabPanel>
 
-          <TabPanel value={TabRoutes.NEWS_EDIT}>
-            <NewsEdit source={{} as NewsItem}/>
+          <TabPanel value={TabRoutes.ADD_NEWS}>
+            <AddNews source={{} as NewsItem}/>
           </TabPanel>
 
           <TabPanel value={TabRoutes.USERS_EDIT}>

@@ -1,7 +1,17 @@
 import {getBearer, setBearer} from "../../utils";
 
-export let BaseUrl = '/api/1.0';
+const getBaseUri = () => {
+  if (process.env.NODE_ENV === 'production') {
+    return '';
+  }
+
+  return 'http://localhost:5002';
+  // return 'http://vm2775977.33ssd.had.wf';
+}
+
+export let BaseUrl = getBaseUri() + '/api/1.0';
 const auth_header = 'Authorization';
+
 
 /**
  * Получаю дефолные заголовки
@@ -64,6 +74,34 @@ export const get = (url: string, ...params: [string, string][]): Promise<Respons
       handleResp(value);
       return value;
     });
+}
+
+/**
+ * Запрос на удаление
+ * @param url
+ * @param content
+ */
+export const deleteJson = (url: string, content: any): Promise<Response> => {
+  return fetch(BaseUrl + url, {
+    body: JSON.stringify(content),
+    method: 'DELETE',
+    headers: {
+      ...getBaseHeaders(),
+      'Accept': 'text/html, application/json',
+      'Content-Type': 'application/json',
+    }
+  })
+    .then(value => {
+      handleResp(value);
+      return value;
+    })
+    .then(x => {
+      if (x.status !== 200) {
+        throw new Error(x.statusText);
+      }
+
+      return x;
+    })
 }
 
 // /**

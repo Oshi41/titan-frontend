@@ -26,10 +26,10 @@ export const NewsFeed = (props: Props) => {
   const [news, setNews] = React.useState<NewsItem[]>([]);
 
   const [size, setSize] = React.useState(10);
-  const [page, setPage] = React.useState(0);
+  const [page, setPage] = React.useState(1);
 
   const refresh = React.useCallback(() => {
-    get('/news', ['page', page + ''], ['size', size + ''])
+    get('/news', ['page', page - 1 + ''], ['size', size + ''])
       .then(x => {
         if (x.status !== 200) {
           throw new Error(x.status + '');

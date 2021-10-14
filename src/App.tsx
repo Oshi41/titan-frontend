@@ -6,10 +6,11 @@ import {BrowserRouter, useHistory} from 'react-router-dom';
 import {useControlledCookieState} from "./hook/useControlledCookieState";
 import {NewsItem, Roles, StoreType, UserAuthType} from './types';
 import {getToken, setBearer} from "./utils";
+import {AddNews} from "./view/AddNews";
+import {CrashView} from "./view/CrashView";
 import {Login} from "./view/Login";
 import {MainView} from "./view/MainView";
 import {ModalDialog} from "./view/ModalDialog";
-import {AddNews} from "./view/AddNews";
 import {Registration} from "./view/Registration";
 import {ServersView} from "./view/ServersView";
 import {UsersEdit} from "./view/UsersEdit";
@@ -21,6 +22,7 @@ export enum TabRoutes {
   SERVERS = '/servers',
   ADD_NEWS = '/add_news',
   USERS_EDIT = '/users_edit',
+  CRASH_VIEW = '/crash',
 }
 
 export const App = (): JSX.Element => {
@@ -50,7 +52,7 @@ export const App = (): JSX.Element => {
       changeTab(TabRoutes.MAIN);
     }
 
-    if ((!token?.login || !token.roles.includes(Roles.Moderator)) && (tab === TabRoutes.ADD_NEWS || tab === TabRoutes.USERS_EDIT)){
+    if ((!token?.login || !token.roles.includes(Roles.Moderator)) && (tab === TabRoutes.ADD_NEWS || tab === TabRoutes.USERS_EDIT)) {
       changeTab(TabRoutes.MAIN);
     }
 
@@ -58,6 +60,7 @@ export const App = (): JSX.Element => {
 
   const tabs = React.useMemo(() => {
     const result: JSX.Element[] = [<Tab label='Главная' value={TabRoutes.MAIN}/>];
+    result.push(<Tab label='Сервера' value={TabRoutes.SERVERS}/>);
 
     const add = storeType === 'ely.by'
       ? 'Ely.by'
@@ -68,10 +71,10 @@ export const App = (): JSX.Element => {
         <Tab label={`Регистрация ${add}`} value={TabRoutes.REGISTRATION}/>,
         <Tab label={`Вход ${add}`} value={TabRoutes.LOGIN}/>
       );
+    } else {
+      result.push(<Tab label='Отчеты об ошибках' value={TabRoutes.CRASH_VIEW}/>);
     }
 
-
-    result.push(<Tab label='Сервера' value={TabRoutes.SERVERS}/>);
 
     if (token?.roles?.includes(Roles.Moderator)) {
       result.push(<Tab label='Добавление новостей' value={TabRoutes.ADD_NEWS}/>);
@@ -163,6 +166,10 @@ export const App = (): JSX.Element => {
 
           <TabPanel value={TabRoutes.USERS_EDIT}>
             <UsersEdit/>
+          </TabPanel>
+
+          <TabPanel value={TabRoutes.CRASH_VIEW}>
+            <CrashView/>
           </TabPanel>
 
         </TabContext>

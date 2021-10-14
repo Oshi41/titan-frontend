@@ -35,6 +35,27 @@ const handleResp = (r: Response) => {
   }
 }
 
+export const post = (url: string, content: any): Promise<Response> => {
+  return fetch(BaseUrl + url, {
+    body: content,
+    method: 'POST',
+    headers: {
+      ...getBaseHeaders(),
+    }
+  })
+    .then(value => {
+      handleResp(value);
+      return value;
+    })
+    .then(x => {
+      if (x.status !== 200) {
+        throw new Error(x.statusText);
+      }
+
+      return x;
+    });
+}
+
 /**
  * Post с json контентом
  * @param url - URI запроса после api текущей версии

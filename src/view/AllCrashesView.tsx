@@ -86,7 +86,7 @@ export const AllCrashesView = (): JSX.Element => {
       },
     },
     {
-      name: 'file',
+      name: 'content',
       label: 'Содержание',
       options: {
         sort: true,

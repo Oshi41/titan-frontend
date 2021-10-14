@@ -28,70 +28,69 @@ export const MainView = (props: Props): JSX.Element => {
 
   return (
 
-    <Grid direction='row'
-          columns={5}>
-      <Grid item
-            xs={4}>
+    <Grid container direction='row'>
+      <Grid item xs={true}>
         <NewsFeed managing={token?.roles?.includes(Roles.Moderator) === true}/>
       </Grid>
 
-      {/*<Grid container*/}
-      {/*      item*/}
-      {/*      direction="column"*/}
-      {/*      justifyContent="space-between"*/}
-      {/*      alignItems="flex-start"*/}
-      {/*      xs={1}*/}
-      {/*      rowSpacing={1}>*/}
+      <Grid item sx={{minWidth: 300, maxWidth: 500}}>
+        <Grid container
+              item
+              direction="column"
+              justifyContent="space-between"
+              alignItems="flex-start"
+              rowSpacing={1}>
 
-      {/*  <Grid item>*/}
-      {/*    <Typography sx={{fontSize: 24}} gutterBottom>*/}
-      {/*      Добро пожаловать на проект Titan!*/}
-      {/*    </Typography>*/}
-      {/*  </Grid>*/}
+          <Grid item>
+            <Typography sx={{fontSize: 24}} gutterBottom>
+              Добро пожаловать на проект Titan!
+            </Typography>
+          </Grid>
 
-      {/*  {props.store === 'ely.by' && (*/}
-      {/*    <Grid item>*/}
-      {/*      <Typography sx={{fontSize: 18}} gutterBottom>*/}
-      {/*        Проект использует авторизацию ely.by. Чтобы играть на проекте, необходимо использовать*/}
-      {/*        существующий аккаунт.*/}
-      {/*      </Typography>*/}
-      {/*    </Grid>*/}
-      {/*  )}*/}
+          {props.store === 'ely.by' && (
+            <Grid item>
+              <Typography sx={{fontSize: 18}} gutterBottom>
+                Проект использует авторизацию ely.by. Чтобы играть на проекте, необходимо использовать
+                существующий аккаунт.
+              </Typography>
+            </Grid>
+          )}
 
-      {/*  {!token?.login && (*/}
-      {/*    <Grid item>*/}
-      {/*      <Button variant="contained"*/}
-      {/*              onClick={() => props.setTab(TabRoutes.LOGIN)}*/}
-      {/*              sx={{fontSize: 18}}*/}
-      {/*              endIcon={<FingerprintIcon/>}>*/}
-      {/*        Войти*/}
-      {/*      </Button>*/}
-      {/*    </Grid>*/}
-      {/*  )}*/}
+          {!token?.login && (
+            <Grid item>
+              <Button variant="contained"
+                      onClick={() => props.setTab(TabRoutes.LOGIN)}
+                      sx={{fontSize: 18}}
+                      endIcon={<FingerprintIcon/>}>
+                Войти
+              </Button>
+            </Grid>
+          )}
 
-      {/*  {!token?.login && (*/}
-      {/*    <Grid item>*/}
-      {/*      <Button variant="contained"*/}
-      {/*              onClick={() => props.setTab(TabRoutes.REGISTRATION)}*/}
-      {/*              sx={{fontSize: 18}}*/}
-      {/*              endIcon={<PermIdentityIcon/>}>*/}
-      {/*        Зарегистрироваться*/}
-      {/*      </Button>*/}
-      {/*    </Grid>*/}
-      {/*  )}*/}
+          {!token?.login && (
+            <Grid item>
+              <Button variant="contained"
+                      onClick={() => props.setTab(TabRoutes.REGISTRATION)}
+                      sx={{fontSize: 18}}
+                      endIcon={<PermIdentityIcon/>}>
+                Зарегистрироваться
+              </Button>
+            </Grid>
+          )}
 
-      {/*  {token?.login && (*/}
-      {/*    <Grid item>*/}
-      {/*      <Button variant="contained"*/}
-      {/*              onClick={onClick}*/}
-      {/*              sx={{fontSize: 18}}*/}
-      {/*              endIcon={<SportsEsportsIcon/>}>*/}
-      {/*        Скачать лаунчер*/}
-      {/*      </Button>*/}
-      {/*    </Grid>*/}
-      {/*  )}*/}
+          {token?.login && (
+            <Grid item>
+              <Button variant="contained"
+                      onClick={onClick}
+                      sx={{fontSize: 18}}
+                      endIcon={<SportsEsportsIcon/>}>
+                Скачать лаунчер
+              </Button>
+            </Grid>
+          )}
 
-      {/*</Grid>*/}
+        </Grid>
+      </Grid>
     </Grid>
   );
 }

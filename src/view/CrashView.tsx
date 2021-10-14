@@ -68,6 +68,7 @@ export const CrashView = () => {
       <TextField
         id="text_comment"
         label="Коментарий для отчета"
+        value={text}
         onChange={event => setText(event.target.value)}
         multiline
         rows={15}

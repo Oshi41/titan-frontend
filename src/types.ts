@@ -183,3 +183,14 @@ export interface SqlUser {
    */
   ip?: string;
 }
+
+/**
+ * Описание краш репорта
+ */
+export interface Report {
+  login: string;
+  date: string;
+  comment: string;
+  content: string;
+  file: string;
+}

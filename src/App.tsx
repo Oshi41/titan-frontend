@@ -7,6 +7,7 @@ import {useControlledCookieState} from "./hook/useControlledCookieState";
 import {NewsItem, Roles, StoreType, UserAuthType} from './types';
 import {getToken, setBearer} from "./utils";
 import {AddNews} from "./view/AddNews";
+import {AllCrashesView} from "./view/AllCrashesView";
 import {CrashView} from "./view/CrashView";
 import {Login} from "./view/Login";
 import {MainView} from "./view/MainView";
@@ -23,6 +24,7 @@ export enum TabRoutes {
   ADD_NEWS = '/add_news',
   USERS_EDIT = '/users_edit',
   CRASH_VIEW = '/crash',
+  CRASH_VIEW_ALL = '/crash_all',
 }
 
 export const App = (): JSX.Element => {
@@ -78,6 +80,8 @@ export const App = (): JSX.Element => {
 
     if (token?.roles?.includes(Roles.Moderator)) {
       result.push(<Tab label='Добавление новостей' value={TabRoutes.ADD_NEWS}/>);
+      result.push(<Tab label='Просмотр отчетов' value={TabRoutes.CRASH_VIEW_ALL}/>);
+
       // result.push(<Tab label='Редактор пользователей' value={TabRoutes.USERS_EDIT}/>);
     }
     return result;
@@ -172,6 +176,9 @@ export const App = (): JSX.Element => {
             <CrashView/>
           </TabPanel>
 
+          <TabPanel value={TabRoutes.CRASH_VIEW_ALL}>
+            <AllCrashesView/>
+          </TabPanel>
         </TabContext>
       </div>
     </BrowserRouter>

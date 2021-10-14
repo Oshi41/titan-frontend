@@ -30,7 +30,7 @@ export const CrashView = () => {
     // @ts-ignore
     data.append('file', file);
 
-    post('/crash', data)
+    post('/crashes', data)
       .then(x => {
         setHelp('Отчет был успешно загружен');
         setLoaded(true);

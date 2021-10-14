@@ -4,6 +4,9 @@
   "private": true,
   "dependencies": {
     "@material-ui/core": "^4.12.3",
+    "@material-ui/icons": "^4.11.2",
+    "@material-ui/lab": "^4.0.0-alpha.60",
+    "@material-ui/pickers": "^3.3.10",
     "@material-ui/styles": "^4.11.4",
     "@material/button": "^13.0.0",
     "@material/chips": "^13.0.0",
@@ -15,15 +18,13 @@
     "js-cookie": "^3.0.1",
     "material-table": "^1.69.3",
     "material-ui": "^1.0.0-beta.47",
+    "mui-datatables": "^3.7.8",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-router-dom": "^5.3.0",
     "react-scripts": "4.0.3",
     "use-cookie-state": "^1.1.1",
-    "web-vitals": "^1.0.1",
-    "@material-ui/lab": "^4.0.0-alpha.60",
-    "@material-ui/icons": "^4.11.2",
-    "@material-ui/pickers": "^3.3.10"
+    "web-vitals": "^1.0.1"
   },
   "devDependencies": {
     "@emotion/react": "^11.4.1",
@@ -39,7 +40,8 @@
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
     "@types/react-router-dom": "^5.3.0",
-    "typescript": "^4.1.2"
+    "typescript": "^4.1.2",
+    "@types/mui-datatables": "^3.7.7"
   },
   "peerDependencies": {},
   "scripts": {

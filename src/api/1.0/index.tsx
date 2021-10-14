@@ -94,6 +94,13 @@ export const get = (url: string, ...params: [string, string][]): Promise<Respons
     .then(value => {
       handleResp(value);
       return value;
+    })
+    .then(x => {
+      if (x.status !== 200) {
+        throw new Error(x.statusText);
+      }
+
+      return x;
     });
 }
 
@@ -110,6 +117,31 @@ export const deleteJson = (url: string, content: any): Promise<Response> => {
       ...getBaseHeaders(),
       'Accept': 'text/html, application/json',
       'Content-Type': 'application/json',
+    }
+  })
+    .then(value => {
+      handleResp(value);
+      return value;
+    })
+    .then(x => {
+      if (x.status !== 200) {
+        throw new Error(x.statusText);
+      }
+
+      return x;
+    })
+}
+
+export const deleteQ = (url: string, ...params: [string, string][]): Promise<Response> => {
+  if (params?.length > 0) {
+    const qPrams: URLSearchParams = new URLSearchParams(params);
+    url += '?' + qPrams.toString();
+  }
+
+  return fetch(BaseUrl + url, {
+    method: 'DELETE',
+    headers: {
+      ...getBaseHeaders(),
     }
   })
     .then(value => {

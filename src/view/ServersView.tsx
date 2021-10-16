@@ -102,23 +102,23 @@ const getControl = (s: ServerDesciption): JSX.Element => {
     ?.modinfo
     ?.modList
     ?.sort(sortFunc)
-    // рисую по алфавитному порядку
-    // ?.sort((a, b) => a.modid.localeCompare(b.modid))
     ?.map(x => {
 
-      return <div style={{flexDirection: 'row'}}>
+
+      return <Typography paragraph>
         {x.page
           ? (
-            <Link sx={{fontSize: 16, fontWeight: 'bold'}} href={x.page}>{x.modid}</Link>
+            <Link sx={{fontSize: 20, fontWeight: 'bold'}} href={x.page}>{x.modid}</Link>
           )
           : (
-            <Typography sx={{fontSize: 16, fontWeight: 'bold'}}>{x.modid}</Typography>
+            <Typography sx={{fontSize: 16}}>{x.modid}</Typography>
           )}
 
         {x.desc && (
-          <Typography sx={{fontSize: 16}}>{'- ' + x.desc}</Typography>)
-        });
-      </div>
+          <Typography sx={{fontSize: 16}} paragraph={true}>{x.desc}</Typography>
+        )}
+
+      </Typography>
     });
 
   return (

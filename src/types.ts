@@ -32,6 +32,26 @@ export interface ServerInfo {
 }
 
 /**
+ * Описание мода
+ */
+export interface ModInfo {
+  /**
+   * ID мода
+   */
+  modid: string;
+
+  /**
+   * Wiki страница
+   */
+  page: string;
+
+  /**
+   * Описание
+   */
+  desc: string;
+}
+
+/**
  * Описание forge сервера
  */
 export interface ForgeInfo {
@@ -47,7 +67,7 @@ export interface ForgeInfo {
   };
   modinfo: {
     type: string;
-    modList: { modid: string, version: string }[];
+    modList: ModInfo [];
   };
   latency: number;
 }

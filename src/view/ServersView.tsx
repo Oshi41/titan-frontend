@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {ServerDesciption} from '../types';
+import {ModInfo, ServerDesciption} from '../types';
 import * as api from '../api/1.0';
 import Grid from '@mui/material/Grid';
 import {Accordion, AccordionDetails, AccordionSummary, Backdrop, Link, Stack, Typography} from '@mui/material';
@@ -83,22 +83,42 @@ export const ServersView = (): JSX.Element => {
   );
 };
 
+const sortFunc = (a: ModInfo, b: ModInfo): number => {
+  if (!b.page) {
+    return -1;
+  }
+
+  if (!a.page) {
+    return 1;
+  }
+
+  return a.modid.localeCompare(b.modid);
+};
+
 const getControl = (s: ServerDesciption): JSX.Element => {
   const {server, forge, extra} = s;
 
   const modsList = forge
     ?.modinfo
     ?.modList
-    ?.sort((a, b) => a.version.localeCompare(b.version))
+    ?.sort(sortFunc)
     // рисую по алфавитному порядку
-    ?.sort((a, b) => a.modid.localeCompare(b.modid))
+    // ?.sort((a, b) => a.modid.localeCompare(b.modid))
     ?.map(x => {
-      return <Typography sx={{fontSize: 16}}>
-        {x.modid}
-        {x.version && (
-          <Link href={x.version} sx={{fontSize: 16}}> - wiki</Link>
-        )}
-      </Typography>;
+
+      return <div style={{flexDirection: 'row'}}>
+        {x.page
+          ? (
+            <Link sx={{fontSize: 16, fontWeight: 'bold'}} href={x.page}>{x.modid}</Link>
+          )
+          : (
+            <Typography sx={{fontSize: 16, fontWeight: 'bold'}}>{x.modid}</Typography>
+          )}
+
+        {x.desc && (
+          <Typography sx={{fontSize: 16}}>{'- ' + x.desc}</Typography>)
+        });
+      </div>
     });
 
   return (
@@ -111,7 +131,7 @@ const getControl = (s: ServerDesciption): JSX.Element => {
 
       <Grid item>
         <Typography sx={{fontSize: 42}} gutterBottom>
-          Сервер {server.motd.raw.join('\n')}
+          {server.motd.raw.join('\n') ?? 'Сервер'}
         </Typography>
       </Grid>
 

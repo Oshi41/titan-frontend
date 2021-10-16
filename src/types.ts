@@ -76,7 +76,15 @@ export interface ForgeInfo {
  * Доп инфа для своих серверов
  */
 export interface ExtraServerInfo {
+  /**
+   * адрес сервера
+   */
+  address: string;
 
+  /**
+   * HTML виджет для статистики
+   */
+  htmlWidget: string;
 }
 
 /**

@@ -135,16 +135,16 @@ const getControl = (s: ServerDesciption): JSX.Element => {
         </Typography>
       </Grid>
 
-      {/*todo extra info */}
-      {extra && (
-        <></>
-      )}
 
       <Grid item>
         <Typography sx={{fontSize: 24, mt: 5, color: 'accent'}} gutterBottom>
           Информация о сервере:
         </Typography>
       </Grid>
+
+      {extra?.htmlWidget && (
+        <div dangerouslySetInnerHTML={{__html: extra.htmlWidget as string}}/>
+      )}
 
       <Grid item>
         <Typography sx={{fontSize: 16}} gutterBottom>

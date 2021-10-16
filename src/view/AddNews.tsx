@@ -2,7 +2,7 @@ import {Button, createTheme, Link, Stack, TextField} from '@mui/material';
 import * as React from 'react';
 import {postJson} from "../api/1.0/index";
 import {useControlledCookieState} from "../hook/useControlledCookieState";
-import {NewsItem, SqlUser, WebToken} from '../types';
+import {NewsItem, UserInfo, WebToken} from '../types';
 import {getToken} from "../utils/index";
 
 interface Props {
@@ -46,7 +46,7 @@ export const AddNews = (props: Props): JSX.Element => {
     }
 
     if (!result.date) {
-      result.date = new Date().toString();
+      result.date = new Date();
     }
 
     postJson('/news', result)

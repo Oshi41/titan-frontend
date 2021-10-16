@@ -5,7 +5,7 @@ import {NewsItem} from "../types";
 import {NewsItemView} from "./NewsItemView";
 
 interface Props {
-  managing: boolean;
+  canDelete: boolean;
 }
 
 export type NewsResp = {
@@ -29,6 +29,8 @@ export const NewsFeed = (props: Props) => {
   const [page, setPage] = React.useState(1);
 
   const refresh = React.useCallback(() => {
+
+
     get('/news', ['page', page - 1 + ''], ['size', size + ''])
       .then(x => {
         if (x.status !== 200) {
@@ -47,8 +49,8 @@ export const NewsFeed = (props: Props) => {
       })
   }, [size, page]);
 
-  const onDelete = React.useCallback((id: string) => {
-    deleteJson('/news', {id})
+  const onDelete = React.useCallback((_id: string) => {
+    deleteJson('/news', {_id})
       .then(x => {
         refresh();
       })
@@ -59,25 +61,27 @@ export const NewsFeed = (props: Props) => {
 
   const [newsJsx, setNewsJsx] = React.useState<JSX.Element[]>([]);
   React.useEffect(() => {
-    let elements: JSX.Element[] = news.map(x => {
-      return <NewsItemView managing={props?.managing}
-                           onDelete={() => onDelete(x.id)}
+    let elements: JSX.Element[] = news.map((x, index) => {
+      return <NewsItemView key={index}
+                           managing={props?.canDelete}
+                           onDelete={() => onDelete(x._id)}
                            source={x}/>;
     });
     setNewsJsx(elements);
-  }, [news, props?.managing]);
+  }, [news, props?.canDelete]);
 
   React.useEffect(refresh, [refresh]);
 
   return (
-    <div>
+    <Stack spacing={2}>
+      {newsJsx}
 
-      <Stack spacing={2}> {newsJsx}</Stack>
-
-      <Pagination count={total}
-                  page={page}
-                  onChange={(event, page1) => setPage(page1)}
-                  color="primary"/>
-    </div>
+      {newsJsx.length > 0 && (
+        <Pagination count={total}
+                    page={page}
+                    onChange={(event, page1) => setPage(page1)}
+                    color="primary"/>
+      )}
+    </Stack>
   )
 }

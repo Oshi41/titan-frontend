@@ -1,6 +1,7 @@
+import {SxProps} from "@mui/system";
 import * as React from 'react';
 import {Button, Link, Stack, TextField, Typography} from "@mui/material";
-import {styled} from '@mui/material/styles';
+import {styled, Theme} from '@mui/material/styles';
 import {post} from "../api/1.0/index";
 import {getToken} from "../utils/index";
 
@@ -8,7 +9,7 @@ const Input = styled('input')({
   display: 'none',
 });
 
-export const CrashView = () => {
+export const CrashCreateView = () => {
 
   const [text, setText] = React.useState('');
   const [file, setFile] = React.useState<File | null>(null);
@@ -44,13 +45,27 @@ export const CrashView = () => {
       });
   };
 
+  const typographyStyle = React.useMemo<SxProps<Theme>>(() => {
+    const result: SxProps<Theme> = {fontSize: 24};
+
+    if (loaded == true) {
+      result.color = 'green';
+    }
+
+    if (loaded === false) {
+      result.color = 'red';
+    }
+
+    return result;
+  }, [loaded]);
+
   return (
     <Stack direction='column'
            spacing={2}>
 
-      <Typography sx={{fontSize: 24}}>Произошла проблема? Отправь её сюда!</Typography>
+      <Typography key={1} sx={typographyStyle}>{help ?? 'Произошла проблема? Отправь её сюда!'}</Typography>
 
-      <label htmlFor="contained-button-file">
+      <label key={2} htmlFor="contained-button-file">
         <Input accept="text/plain"
                id="contained-button-file"
                onChange={e => setFile(e?.target?.files?.item(0) as File | null)}
@@ -62,10 +77,11 @@ export const CrashView = () => {
       </label>
 
       {file?.name && (
-        <Typography sx={{fontSize: 16}}>{file.name}</Typography>
+        <Typography key={2} sx={{fontSize: 16}}>{file.name}</Typography>
       )}
 
       <TextField
+        key={3}
         id="text_comment"
         label="Коментарий для отчета"
         value={text}
@@ -73,12 +89,11 @@ export const CrashView = () => {
         multiline
         rows={15}
         maxRows={15}
-        color={loaded === true ? 'success' : 'primary'}
-        error={loaded === false}
-        helperText={help ?? 'Краткая информация, которую необходимо донести автору проекта'}
+        helperText='Краткая информация, которую необходимо донести автору проекта'
       />
 
-      <Button variant='contained'
+      <Button key={4}
+              variant='contained'
               onClick={onSave}
               disabled={!file || !text}>
         Отправить

@@ -110,18 +110,57 @@ export enum UserAuthType {
  * Возможные типы данных
  */
 export enum Roles {
-  Moderator = 'moderator',
+  //
+  // CRUD для таблицы пользователей
+  // + View привилегия
+  //
+  UserView = 'user_v',
+  UserCreate = 'user_c',
+  UserEdit = 'user_e',
+  UserDelete = 'user_d',
+
+  //
+  // CRUD для таблицы новостей
+  //
+  NewsCreate = 'news_c',
+  NewsEdit = 'news_u',
+  NewsDelete = 'news_d',
+
+  //
+  // Для таблицы crash reports
+  //
+  CrashReportView = 'crash_v',
+  CrashReportCreate = 'crash_c',
+  CrashReportDelete = 'crash_d',
+
   Comment = 'comment',
 }
+
+export const RolesNames = new Map<Roles, string>([
+  [Roles.UserView, 'Просмотр пользователей'],
+  [Roles.UserCreate, 'Создание пользователей'],
+  [Roles.UserEdit, 'Редактирование пользователей'],
+  [Roles.UserDelete, 'Удаление пользователей'],
+
+  [Roles.NewsCreate, 'Создание новостей'],
+  [Roles.NewsEdit, 'Редактирование новостей'],
+  [Roles.NewsDelete, 'Удаление новостей'],
+
+  [Roles.CrashReportView, 'Просмотр отчетов об ошибке'],
+  [Roles.CrashReportCreate, 'Создание отчета об ошибке'],
+  [Roles.CrashReportDelete, 'Удаление отчетов об ошибке'],
+
+  [Roles.Comment, 'Комментарии'],
+])
 
 /**
  * Представление новости
  */
 export interface NewsItem {
   /**
-   * uuid новости
+   * Уникальная 16-сивольная строка
    */
-  id: string;
+  _id: string;
 
   /**
    * Автор новости
@@ -131,7 +170,7 @@ export interface NewsItem {
   /**
    * Дата создания
    */
-  date: string;
+  date: Date;
 
   /**
    * Заголовок новости
@@ -146,13 +185,13 @@ export interface NewsItem {
   /**
    * изображение
    */
-  image: Blob;
+  image64: string;
 }
 
 /**
  * Описание пользователя
  */
-export interface SqlUser {
+export interface UserInfo {
   /**
    * Логин
    */
@@ -182,6 +221,11 @@ export interface SqlUser {
    * IP регистрации
    */
   ip?: string;
+
+  /**
+   * Список ролей
+   */
+  roles: Roles[];
 }
 
 /**

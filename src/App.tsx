@@ -8,13 +8,13 @@ import {NewsItem, Roles, StoreType, UserAuthType} from './types';
 import {getToken, setBearer} from "./utils";
 import {AddNews} from "./view/AddNews";
 import {AllCrashesView} from "./view/AllCrashesView";
-import {CrashView} from "./view/CrashView";
+import {CrashCreateView} from "./view/CrashCreateView";
 import {Login} from "./view/Login";
 import {MainView} from "./view/MainView";
 import {ModalDialog} from "./view/ModalDialog";
 import {Registration} from "./view/Registration";
 import {ServersView} from "./view/ServersView";
-import {UsersEdit} from "./view/UsersEdit";
+import {UsersView} from "./view/UsersView";
 
 export enum TabRoutes {
   MAIN = '/main',
@@ -22,7 +22,7 @@ export enum TabRoutes {
   LOGIN = '/login',
   SERVERS = '/servers',
   ADD_NEWS = '/add_news',
-  USERS_EDIT = '/users_edit',
+  USERS_VIEW = '/users_view',
   CRASH_VIEW = '/crash',
   CRASH_VIEW_ALL = '/crash_all',
 }
@@ -31,61 +31,56 @@ export const App = (): JSX.Element => {
   let history = useHistory();
 
   const [tab, setTab] = useControlledCookieState<TabRoutes>('titan_tab', TabRoutes.MAIN);
-  const [storeType, setStoreType] = React.useState<StoreType | undefined>('sqlite');
   const token = getToken();
 
   const [loading, setLoading] = React.useState(false);
   const [showLogOut, setShowLogOut] = React.useState(false);
 
   const changeTab = React.useCallback((t: TabRoutes) => {
-
-    if (storeType == 'ely.by' && t === TabRoutes.REGISTRATION) {
-      window.location.href = 'https://account.ely.by/register';
-      return;
-    }
-
     setTab(t);
     history.push(t);
-  }, [storeType]);
-
-  // В случае успешного входа, надо  перейти с не нужных табов
-  React.useEffect(() => {
-    if (token?.login && (tab === TabRoutes.REGISTRATION || tab === TabRoutes.LOGIN)) {
-      changeTab(TabRoutes.MAIN);
-    }
-
-    if ((!token?.login || !token.roles.includes(Roles.Moderator)) && (tab === TabRoutes.ADD_NEWS || tab === TabRoutes.USERS_EDIT)) {
-      changeTab(TabRoutes.MAIN);
-    }
-
-  }, [token?.login]);
+  }, []);
 
   const tabs = React.useMemo(() => {
-    const result: JSX.Element[] = [<Tab label='Главная' value={TabRoutes.MAIN}/>];
-    result.push(<Tab label='Сервера' value={TabRoutes.SERVERS}/>);
-
-    const add = storeType === 'ely.by'
-      ? 'Ely.by'
-      : '';
+    const result: JSX.Element[] = [
+      <Tab label='Главная' value={TabRoutes.MAIN}/>,
+      <Tab label='Сервера' value={TabRoutes.SERVERS}/>
+    ];
 
     if (!token?.login) {
       result.push(
-        <Tab label={`Регистрация ${add}`} value={TabRoutes.REGISTRATION}/>,
-        <Tab label={`Вход ${add}`} value={TabRoutes.LOGIN}/>
+        <Tab key={1} label={`Регистрация`} value={TabRoutes.REGISTRATION}/>,
+        <Tab key={2} label={`Вход`} value={TabRoutes.LOGIN}/>
       );
-    } else {
-      result.push(<Tab label='Отчеты об ошибках' value={TabRoutes.CRASH_VIEW}/>);
     }
 
-
-    if (token?.roles?.includes(Roles.Moderator)) {
-      result.push(<Tab label='Добавление новостей' value={TabRoutes.ADD_NEWS}/>);
-      result.push(<Tab label='Просмотр отчетов' value={TabRoutes.CRASH_VIEW_ALL}/>);
-
-      // result.push(<Tab label='Редактор пользователей' value={TabRoutes.USERS_EDIT}/>);
+    if (token?.roles?.includes(Roles.CrashReportCreate)) {
+      result.push(<Tab key={3} label='Отчеты об ошибках' value={TabRoutes.CRASH_VIEW}/>);
     }
+
+    if (token?.roles?.includes(Roles.NewsCreate)) {
+      result.push(<Tab key={5} label='Добавление новостей' value={TabRoutes.ADD_NEWS}/>);
+    }
+
+    if (token?.roles?.includes(Roles.CrashReportView)) {
+      result.push(<Tab key={6} label='Просмотр отчетов' value={TabRoutes.CRASH_VIEW_ALL}/>);
+    }
+
+    if (token?.roles?.includes(Roles.UserView)) {
+      result.push(<Tab key={7} label='Пользователи' value={TabRoutes.USERS_VIEW}/>);
+    }
+
     return result;
-  }, [token?.login, storeType]);
+  }, [token?.login,]);
+
+  // В случае успешного входа, надо  перейти с не нужных табов
+  React.useEffect(() => {
+
+    const result = tabs.map(x => x.props.value);
+    if (!result?.includes(tab)) {
+      changeTab(TabRoutes.MAIN);
+    }
+  }, [tabs]);
 
   const avatar = React.useMemo(() => {
     if (!token?.auth) {
@@ -94,7 +89,8 @@ export const App = (): JSX.Element => {
 
     switch (token.auth) {
       case UserAuthType.Own:
-        return <Avatar>own</Avatar>;
+          return <Avatar variant='square'
+                         src='https://icons.iconarchive.com/icons/bokehlicia/captiva/256/rocket-icon.png'/>;
 
       case UserAuthType.ElyBy:
         return <Avatar variant='square'
@@ -102,7 +98,7 @@ export const App = (): JSX.Element => {
     }
 
     return undefined;
-  }, [storeType, token?.auth]);
+  }, [token?.auth]);
 
   return (
     <BrowserRouter>
@@ -146,7 +142,7 @@ export const App = (): JSX.Element => {
           </Stack>
 
           <TabPanel value={TabRoutes.MAIN}>
-            <MainView setTab={changeTab} store={storeType}/>
+            <MainView setTab={changeTab}/>
           </TabPanel>
           <TabPanel value={TabRoutes.REGISTRATION}>
             <Registration onRegister={name => {
@@ -154,8 +150,7 @@ export const App = (): JSX.Element => {
             }}/>
           </TabPanel>
           <TabPanel value={TabRoutes.LOGIN}>
-            <Login store={storeType}
-                   onLogin={name => {
+            <Login onLogin={name => {
                      changeTab(TabRoutes.MAIN);
                    }}/>
           </TabPanel>
@@ -168,16 +163,16 @@ export const App = (): JSX.Element => {
             <AddNews source={{} as NewsItem}/>
           </TabPanel>
 
-          <TabPanel value={TabRoutes.USERS_EDIT}>
-            <UsersEdit/>
-          </TabPanel>
-
           <TabPanel value={TabRoutes.CRASH_VIEW}>
-            <CrashView/>
+            <CrashCreateView/>
           </TabPanel>
 
           <TabPanel value={TabRoutes.CRASH_VIEW_ALL}>
             <AllCrashesView/>
+          </TabPanel>
+
+          <TabPanel value={TabRoutes.USERS_VIEW}>
+            <UsersView/>
           </TabPanel>
         </TabContext>
       </div>

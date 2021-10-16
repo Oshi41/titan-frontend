@@ -1,7 +1,7 @@
 import FingerprintIcon from '@mui/icons-material/Fingerprint';
 import PermIdentityIcon from '@mui/icons-material/PermIdentity';
 import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
-import {Button, Grid, Typography} from "@mui/material";
+import {Button, Grid, Stack, Typography} from "@mui/material";
 import * as React from 'react';
 import {BaseUrl} from '../api/1.0';
 import {TabRoutes} from '../App';
@@ -11,7 +11,6 @@ import {NewsFeed} from "./NewsFeed";
 
 interface Props {
   setTab: (tab: TabRoutes) => void;
-  store: StoreType | undefined;
 }
 
 export const MainView = (props: Props): JSX.Element => {
@@ -27,70 +26,40 @@ export const MainView = (props: Props): JSX.Element => {
   }, []);
 
   return (
+    <Stack direction='column'
+           spacing={2}>
+      <Typography sx={{fontSize: 24}} gutterBottom>
+        Добро пожаловать на проект Titan!
+      </Typography>
 
-    <Grid container direction='row'>
-      <Grid item xs={true}>
-        <NewsFeed managing={token?.roles?.includes(Roles.Moderator) === true}/>
-      </Grid>
+      {!token?.login && (
+        <Button variant="contained"
+                onClick={() => props.setTab(TabRoutes.LOGIN)}
+                sx={{fontSize: 18, maxWidth: 300}}
+                endIcon={<FingerprintIcon/>}>
+          Войти
+        </Button>
+      )}
 
-      <Grid item sx={{minWidth: 300, maxWidth: 500}}>
-        <Grid container
-              item
-              direction="column"
-              justifyContent="space-between"
-              alignItems="flex-start"
-              rowSpacing={1}>
+      {!token?.login && (
+        <Button variant="contained"
+                onClick={() => props.setTab(TabRoutes.REGISTRATION)}
+                sx={{fontSize: 18, maxWidth: 300}}
+                endIcon={<PermIdentityIcon/>}>
+          Зарегистрироваться
+        </Button>
+      )}
 
-          <Grid item>
-            <Typography sx={{fontSize: 24}} gutterBottom>
-              Добро пожаловать на проект Titan!
-            </Typography>
-          </Grid>
+      {token?.login && (
+        <Button variant="contained"
+                onClick={onClick}
+                sx={{fontSize: 18, maxWidth: 300}}
+                endIcon={<SportsEsportsIcon/>}>
+          Скачать лаунчер
+        </Button>
+      )}
 
-          {props.store === 'ely.by' && (
-            <Grid item>
-              <Typography sx={{fontSize: 18}} gutterBottom>
-                Проект использует авторизацию ely.by. Чтобы играть на проекте, необходимо использовать
-                существующий аккаунт.
-              </Typography>
-            </Grid>
-          )}
-
-          {!token?.login && (
-            <Grid item>
-              <Button variant="contained"
-                      onClick={() => props.setTab(TabRoutes.LOGIN)}
-                      sx={{fontSize: 18}}
-                      endIcon={<FingerprintIcon/>}>
-                Войти
-              </Button>
-            </Grid>
-          )}
-
-          {!token?.login && (
-            <Grid item>
-              <Button variant="contained"
-                      onClick={() => props.setTab(TabRoutes.REGISTRATION)}
-                      sx={{fontSize: 18}}
-                      endIcon={<PermIdentityIcon/>}>
-                Зарегистрироваться
-              </Button>
-            </Grid>
-          )}
-
-          {token?.login && (
-            <Grid item>
-              <Button variant="contained"
-                      onClick={onClick}
-                      sx={{fontSize: 18}}
-                      endIcon={<SportsEsportsIcon/>}>
-                Скачать лаунчер
-              </Button>
-            </Grid>
-          )}
-
-        </Grid>
-      </Grid>
-    </Grid>
+      <NewsFeed canDelete={token?.roles?.includes(Roles.NewsDelete) === true}/>
+    </Stack>
   );
 }

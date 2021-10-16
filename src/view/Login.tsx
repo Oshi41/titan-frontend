@@ -10,7 +10,6 @@ import {setBearer} from "../utils/index";
 
 interface Props {
   onLogin: (login: string) => void;
-  store: StoreType | undefined;
 }
 
 export const Login = (props: Props): JSX.Element => {
@@ -27,7 +26,7 @@ export const Login = (props: Props): JSX.Element => {
 
   const [sending, setSending] = React.useState(false);
 
-  const onRegister = React.useCallback(() => {
+  const onLogin = React.useCallback(() => {
     setSending(true);
 
     api.get('/login', ['login', login], ['pass', pass], ['token', ''])
@@ -86,7 +85,7 @@ export const Login = (props: Props): JSX.Element => {
 
       <Grid item>
         <LoadingButton loading={sending}
-                       onClick={onRegister}
+                       onClick={onLogin}
                        variant="contained"
                        loadingPosition="end"
                        disabled={!login || !pass}

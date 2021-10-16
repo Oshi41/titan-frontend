@@ -17,7 +17,7 @@ export const NewsItemView = (props: Props): JSX.Element => {
   };
 
   return (
-    <Card sx={{minWidth: 275, maxWidth: 650}}>
+    <Card sx={{minWidth: 275, maxWidth: '100%'}} elevation={24}>
       <CardContent>
         <Grid container direction='row'>
           <Grid item xs={true}>

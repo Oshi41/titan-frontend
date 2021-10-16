@@ -1,9 +1,9 @@
-import {Delete} from "@material-ui/icons";
+import {MuiThemeProvider} from "@material-ui/core";
 import {Button, TableCell, TableRow, TextField} from "@mui/material";
 import * as React from "react";
 import MUIDataTable, {MUIDataTableColumnDef, MUIDataTableMeta} from "mui-datatables";
 import {deleteQ, get} from "../api/1.0/index";
-import {Report, SqlUser} from "../types";
+import {Report, UserInfo} from "../types";
 
 interface CrashResp {
   total: number;
@@ -39,13 +39,31 @@ export const AllCrashesView = (): JSX.Element => {
   }, [page, pageSize]);
   React.useEffect(refresh, [refresh]);
 
-  const onDelete = React.useCallback((x: Report) => {
-    deleteQ('/crashes', ['login', x.login], ['name', x.file])
+  const onRowsDelete = React.useCallback((
+    rowsDeleted: {
+      lookup: { [dataIndex: number]: boolean };
+      data: Array<{ index: number; dataIndex: number }>;
+    },
+    newTableData: any[],
+  ): void | false => {
+
+    const toDelete: Report[] = rowsDeleted.data.map(x => data[x.dataIndex]);
+    let promises: Promise<Response>[] = toDelete.map(x => deleteQ('/crashes', ['login', x.login], ['name', x.file]));
+
+    Promise.all(promises)
       .then(x => {
         refresh();
       })
-      .catch(x => console.log(x));
-  }, [refresh]);
+      .catch(x => {
+        console.log(x);
+      });
+
+    return false;
+  }, [data]);
+
+  const onRowSelectionChange = React.useCallback(
+    (current: any[], all: { index: number, dataIndex: number }[], selected?: any[]) => {
+    }, []);
 
   // Порядок не менять, он важен!
   const columns: MUIDataTableColumnDef[] = [
@@ -90,75 +108,55 @@ export const AllCrashesView = (): JSX.Element => {
         sort: true,
         filter: true,
         customBodyRender: (value, tableMeta, updateValue) => {
-          return <TextField
+          return (<TextField
             sx={{minWidth: 500}}
             id="comment_field"
             label="Комментарий"
             value={value}
-            disabled
             multiline
-            minRows={3}
-            maxRows={15}
-          />
+            rows={3}
+          />);
         }
       },
-    },
-    {
-      name: 'actions',
-      label: 'Действия',
-      options: {
-        sort: false,
-        filter: false,
-        customBodyRender: (value: any, tableMeta: MUIDataTableMeta, updateValue: (value: string) => void) => {
-          // @ts-ignore
-          let [login, file] = tableMeta.tableData[tableMeta.rowIndex];
-
-          const report = {
-            login: login as string,
-            file: file as string
-          } as Report;
-
-          return (
-            <Button startIcon={<Delete/>} onClick={e => onDelete(report)}>Удалить</Button>
-          )
-        },
-      }
     },
   ];
 
   return (
-    <div>
-      <MUIDataTable columns={columns}
-                    data={data}
-                    title='Список краш репортов'
-                    options={{
-                      expandableRows: true,
-                      search: 'false',
-                      print: 'false',
-                      filter: 'false',
-                      viewColumns: 'false',
-                      download: 'false',
-                      renderExpandableRow: (rowData, rowMeta) => {
-                        const colSpan = rowData.length + 1;
-                        const [a, b, content] = rowData;
+    <MUIDataTable title='Список краш репортов'
+                  data={data}
+                  columns={columns}
+                  options={{
+                    expandableRows: true,
+                    selectableRows: 'multiple',
+                    search: 'false',
+                    print: 'false',
+                    filter: 'false',
+                    viewColumns: 'false',
+                    download: 'false',
+                    onRowsDelete: onRowsDelete,
+                    onChangePage: setPage,
+                    onRowSelectionChange: onRowSelectionChange,
+                    onChangeRowsPerPage: setPageSize,
+                    renderExpandableRow: (rowData, rowMeta) => {
+                      const colSpan = rowData.length + 1;
+                      const [a, b, content] = rowData;
 
-                        return <TableRow>
-                          <TableCell colSpan={colSpan}>
-                            <TextField
-                              sx={{display: 'flex'}}
-                              id="text_field"
-                              label="Содержимое файла"
-                              value={content}
-                              disabled
-                              multiline
-                              rows={15}
-                              maxRows={15}
-                            />
-                          </TableCell>
-                        </TableRow>;
-                      }
-                    }}
-      />
-    </div>
+                      return <TableRow>
+                        <TableCell colSpan={colSpan}>
+                          <TextField
+                            sx={{display: 'flex', color: 'black'}}
+                            id="text_field"
+                            label="Содержимое файла"
+                            value={content}
+                            color='info'
+                            multiline
+                            rows={15}
+                            maxRows={15}
+                          />
+                        </TableCell>
+                      </TableRow>;
+                    }
+                  }}
+    />
   );
 }

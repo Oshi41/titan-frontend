@@ -89,14 +89,16 @@ const getControl = (s: ServerDesciption): JSX.Element => {
   const modsList = forge
     ?.modinfo
     ?.modList
+    ?.sort((a, b) => a.version.localeCompare(b.version))
     // рисую по алфавитному порядку
     ?.sort((a, b) => a.modid.localeCompare(b.modid))
     ?.map(x => {
-      return x.version
-        ? <Link href={x.version} sx={{fontSize: 16}}>{x.modid}</Link>
-        : <Typography sx={{fontSize: 16}}>
-          {x.modid}
-        </Typography>;
+      return <Typography sx={{fontSize: 16}}>
+        {x.modid}
+        {x.version && (
+          <Link href={x.version} sx={{fontSize: 16}}> - wiki</Link>
+        )}
+      </Typography>;
     });
 
   return (
@@ -109,7 +111,7 @@ const getControl = (s: ServerDesciption): JSX.Element => {
 
       <Grid item>
         <Typography sx={{fontSize: 42}} gutterBottom>
-          Сервер {server.hostname}
+          Сервер {server.motd.raw.join('\n')}
         </Typography>
       </Grid>
 
@@ -135,14 +137,6 @@ const getControl = (s: ServerDesciption): JSX.Element => {
           Адрес сервера: {server.ip + ':' + server.port}
         </Typography>
       </Grid>
-
-      {forge?.latency && (
-        <Grid item>
-          <Typography sx={{fontSize: 16}} gutterBottom>
-            Пинг: {forge.latency} млс
-          </Typography>
-        </Grid>
-      )}
 
       <Grid item>
         <Typography sx={{fontSize: 16}} gutterBottom>

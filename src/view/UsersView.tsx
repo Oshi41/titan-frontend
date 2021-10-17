@@ -1,8 +1,11 @@
-import {Box, Checkbox, Chip, FormControl, ListItemText, MenuItem, Select, Stack} from "@mui/material";
+import {Delete} from "@material-ui/icons";
+import {Backdrop, Box, Button, Checkbox, Chip, IconButton, ListItemText, MenuItem, Select, Stack} from "@mui/material";
+import CircularProgress from "@mui/material/CircularProgress/CircularProgress";
+import MUIDataTable, {DisplayData, MUIDataTableColumnDef, MUISortOptions} from "mui-datatables";
 import * as React from "react";
-import MUIDataTable, {MUIDataTableColumnDef} from "mui-datatables";
-import {post} from "../api/1.0/index";
-import {Roles, RolesNames, UserInfo} from "../types";
+import {deleteJson, postJson} from "../api/1.0/index";
+import {Roles, RolesNames, UserInfo, WebToken} from "../types";
+import {getToken} from "../utils/index";
 
 interface UsersResp {
   items: UserInfo[],
@@ -21,8 +24,15 @@ export const UsersView = (): JSX.Element => {
   const [page, setPage] = React.useState(1);
   const [pageSize, setPageSize] = React.useState(10);
   const [total, setTotal] = React.useState(0);
+  const [sorting, setSorting] = React.useState<MUISortOptions>({name: 'login', direction: 'asc'});
+  const [loading, setLoading] = React.useState(false);
 
+  /**
+   * Callback обновления
+   */
   const refresh = React.useCallback(() => {
+    setLoading(true);
+
     const q: UsersRequest = {
       page,
       size: pageSize,
@@ -30,7 +40,11 @@ export const UsersView = (): JSX.Element => {
       query: {},
     };
 
-    post('/getUsers', q).then(x => x.json()).then((x: UsersResp) => {
+    if (sorting?.name) {
+      q.sort[sorting.name] = sorting.direction === 'asc' ? 1 : -1;
+    }
+
+    postJson('/users', q).then(x => x.json()).then((x: UsersResp) => {
       setTotal(x.count);
       const infos: UserInfo[] = x.items.map((value, index) => ({
         ...value,
@@ -39,26 +53,66 @@ export const UsersView = (): JSX.Element => {
 
       setData(infos);
     })
+      .finally(() => setLoading(false));
 
-  }, [page, pageSize]);
-
+  }, [page, pageSize, sorting]);
+  // Обновление при смене одного из элементов
   React.useEffect(refresh, [refresh]);
 
-  const onRowsDelete = React.useCallback((
-    rowsDeleted: {
-      lookup: { [dataIndex: number]: boolean };
-      data: Array<{ index: number; dataIndex: number }>;
-    },
-    newTableData: any[],
-  ): void | false => {
-    // todo implement
-    return false;
-  }, [data]);
+  /**
+   * Текущий токен
+   */
+  let token: WebToken | undefined = getToken();
 
-  const onRowSelectionChange = React.useCallback(
-    (current: any[], all: { index: number, dataIndex: number }[], selected?: any[]) => {
-    }, []);
+  /**
+   * Удаление строк
+   */
+  const onRowsDelete = React.useCallback((source: UserInfo[]): void => {
+    // удаляю ненужные поля
+    const items = source.map(x => ({login: x.login}));
 
+    const promises: Promise<Response>[] = items.map(x => deleteJson('/users', x));
+    Promise.all(promises)
+      .then(x => {
+        refresh();
+      })
+      .catch(x => {
+        console.log(x);
+      })
+
+  }, [data, refresh]);
+
+  /**
+   * Катомный тулбар
+   */
+  const renderSelectToolbar = React.useCallback((
+    selectedRows: { data: Array<{ index: number; dataIndex: number }>; lookup: { [key: number]: boolean } },
+    displayData: DisplayData,
+    setSelectedRows: (rows: number[]) => void,
+  ) => {
+
+    // Нашёл данные в массиве
+    const items = selectedRows.data
+      .map(x => x.dataIndex)
+      .map(x => data[x])
+
+    // привилегии + не могу удалить себя
+    const canDelete = token?.roles?.includes(Roles.UserDelete) && items.every(x => x.login !== token?.login);
+
+    return (
+      <Stack direction='row' sx={{mr: 2}}>
+        {canDelete && (
+          <IconButton aria-label="delete"
+                      size="large"
+                      onClick={() => onRowsDelete(items)}>
+            <Delete fontSize="inherit"/>
+          </IconButton>
+        )}
+      </Stack>
+    );
+  }, [data, onRowsDelete]);
+
+  // определение колонок
   const columns: MUIDataTableColumnDef[] = [
     {
       name: 'login',
@@ -174,21 +228,33 @@ export const UsersView = (): JSX.Element => {
   ];
 
   return (
-    <MUIDataTable title='Список зарегистрированных пользователей'
-                  data={data}
-                  columns={columns}
-                  options={{
-                    selectableRows: 'multiple',
-                    search: 'false',
-                    print: 'false',
-                    filter: 'false',
-                    viewColumns: 'false',
-                    download: 'false',
-                    onRowsDelete: onRowsDelete,
-                    onChangePage: setPage,
-                    onRowSelectionChange: onRowSelectionChange,
-                    onChangeRowsPerPage: setPageSize,
-                  }}
-    />
+    <>
+      <Backdrop
+        sx={{color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1}}
+        open={loading}>
+        <CircularProgress color="inherit"/>
+      </Backdrop>
+
+      <MUIDataTable title='Список зарегистрированных пользователей'
+                    data={data}
+                    columns={columns}
+                    options={{
+                      selectableRows: 'multiple',
+                      customToolbarSelect: renderSelectToolbar,
+                      search: 'false',
+                      print: 'false',
+                      filter: 'false',
+                      viewColumns: 'false',
+                      download: 'false',
+                      onChangePage: setPage,
+                      page,
+                      rowsPerPage: pageSize,
+                      serverSide: true,
+                      count: total,
+                      sortOrder: sorting,
+                      onColumnSortChange: (changedColumn, direction) => setSorting({name: changedColumn, direction}),
+                      onChangeRowsPerPage: setPageSize,
+                    }}/>
+    </>
   );
 }

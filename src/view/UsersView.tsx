@@ -34,7 +34,7 @@ export const UsersView = (): JSX.Element => {
     setLoading(true);
 
     const q: UsersRequest = {
-      page,
+      page: page - 1,
       size: pageSize,
       sort: {},
       query: {},

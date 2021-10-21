@@ -5,8 +5,8 @@ const getBaseUri = () => {
     return '';
   }
 
-  //return 'http://localhost:5002';
-  return 'http://vm2775977.33ssd.had.wf';
+  return 'http://localhost:5002';
+  //return 'http://vm2775977.33ssd.had.wf';
 }
 
 export let BaseUrl = getBaseUri() + '/api/1.0';

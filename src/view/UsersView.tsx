@@ -238,7 +238,7 @@ export const UsersView = (): JSX.Element => {
         customBodyRender: (value, tableMeta, updateValue) => {
           const _id = tableMeta.rowData[0];
 
-          return <Checkbox value={value}
+          return <Checkbox checked={value}
                            onChange={(event, checked) => {
                              onRowEdit(_id, x => {
                                x.whitelisted = checked;

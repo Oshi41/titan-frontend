@@ -221,6 +221,11 @@ export interface NewsItem {
  */
 export interface UserInfo {
   /**
+   * Уникальный ID пользователя
+   */
+  _id: string;
+
+  /**
    * Логин
    */
   login: string;
@@ -254,6 +259,11 @@ export interface UserInfo {
    * Список ролей
    */
   roles: Roles[];
+
+  /**
+   * Входит ли в белый список
+   */
+  whitelisted?: boolean;
 }
 
 /**
